@@ -8,6 +8,13 @@ import {
   getProducts,
   updateProduct,
 } from "./handlers/product";
+import {
+  createUpdate,
+  deleteUpdate,
+  getOneUpdate,
+  getUpdates,
+  updateUpdate,
+} from "./handlers/update";
 
 const router = Router();
 
@@ -43,23 +50,26 @@ router.delete(
  *Update
  */
 
-router.get("/update", () => {});
-router.get("/update/:id", () => {});
+router.get("/update", getUpdates);
+router.get("/update/:id", getOneUpdate);
 router.put(
   "/update/:id",
   body("title").optional(),
   body("body").optional(),
-  body("status").isIn(["IN_PROGRESS", "DEPRECATED", "SHIPPED"]),
+  body("status").isIn(["IN_PROGRESS", "DEPRECATED", "SHIPPED"]).optional(),
   body("version").optional(),
-  () => {}
+  handleValidationErrors,
+  updateUpdate
 );
 router.post(
   "/update",
   body("title").exists().isString(),
   body("body").exists().isString(),
-  () => {}
+  body("productId").exists().isString(),
+  handleValidationErrors,
+  createUpdate
 );
-router.delete("/update/:id", () => {});
+router.delete("/update/:id", deleteUpdate);
 
 /**
  *Update Point
@@ -70,14 +80,18 @@ router.get("/updatepoint/:id", () => {});
 router.put(
   "/updatepoint/:id",
   body("name").optional().isString(),
-  body("description").optional().isString(),
-  () => {}
+  body("description").exists().isString(),
+  handleValidationErrors,
+  (req, res) => {
+    res.json({ message: "success" });
+  }
 );
 router.post(
   "/updatepoint",
   body("name").exists().isString(),
   body("description").exists().isString(),
   body("updateId").exists().isString(),
+  handleValidationErrors,
   () => {}
 );
 router.delete("/updatepoint/:id", () => {});
